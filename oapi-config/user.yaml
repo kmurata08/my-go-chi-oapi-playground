@@ -1,0 +1,10 @@
+output: internal/gen/user/api.gen.go
+package: user
+generate:
+  chi-server: true
+import-mapping:
+  ./schemas/user.yaml: github.com/kmurata08/my-go-chi-oapi-playground/internal/user
+  ./schemas/request-responses.yaml: github.com/kmurata08/my-go-chi-oapi-playground/internal/user
+  ../../common/schemas/error.yaml: github.com/kmurata08/my-go-chi-oapi-playground/internal/models
+  ../../common/responses/errors.yaml: github.com/kmurata08/my-go-chi-oapi-playground/internal/models
+  ../schemas/error.yaml: github.com/kmurata08/my-go-chi-oapi-playground/internal/models
