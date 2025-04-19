@@ -2,16 +2,19 @@ package main
 
 import (
 	"github.com/kmurata08/my-go-chi-oapi-playground/internal/common/server"
+	"github.com/kmurata08/my-go-chi-oapi-playground/internal/user"
 
 	"log"
 	"net/http"
 )
 
 func main() {
-	// ルーターの作成
 	r := server.NewRouter()
 
-	// サーバー起動
+	userService := user.NewService()
+	userHandler := user.NewHandler(userService)
+	userHandler.Register(r)
+
 	log.Println("Server starting on :8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
