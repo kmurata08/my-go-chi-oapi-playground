@@ -1,0 +1,4 @@
+components:
+  schemas:
+    APIError:
+      $ref: './schemas/api_error.yaml'

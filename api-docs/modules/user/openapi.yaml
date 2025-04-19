@@ -5,102 +5,17 @@ info:
   description: ユーザー管理機能のAPI定義
 paths:
   /api/users:
-    get:
-      summary: ユーザー一覧の取得
-      operationId: listUsers
-      tags:
-        - users
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                $ref: './schemas/request-responses.yaml#/ListUsersResponse'
-        '400':
-          $ref: '../../common/responses/errors.yaml#/BadRequest'
-        '500':
-          $ref: '../../common/responses/errors.yaml#/InternalError'
-    post:
-      summary: 新規ユーザーの作成
-      operationId: createUser
-      tags:
-        - users
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: './schemas/request-responses.yaml#/CreateUserRequest'
-      responses:
-        '201':
-          description: ユーザーが作成されました
-          content:
-            application/json:
-              schema:
-                $ref: './schemas/user.yaml#/User'
-        '400':
-          $ref: '../../common/responses/errors.yaml#/BadRequest'
-        '500':
-          $ref: '../../common/responses/errors.yaml#/InternalError'
-
+    $ref: './paths/api_users.yaml'
   /api/users/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-        description: ユーザーID
-    get:
-      summary: 指定IDのユーザー情報取得
-      operationId: getUserById
-      tags:
-        - users
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                $ref: './schemas/user.yaml#/User'
-        '404':
-          $ref: '../../common/responses/errors.yaml#/NotFound'
-        '500':
-          $ref: '../../common/responses/errors.yaml#/InternalError'
-    put:
-      summary: ユーザー情報の更新
-      operationId: updateUser
-      tags:
-        - users
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: './schemas/request-responses.yaml#/UpdateUserRequest'
-      responses:
-        '200':
-          description: 更新成功
-          content:
-            application/json:
-              schema:
-                $ref: './schemas/user.yaml#/User'
-        '400':
-          $ref: '../../common/responses/errors.yaml#/BadRequest'
-        '404':
-          $ref: '../../common/responses/errors.yaml#/NotFound'
-        '500':
-          $ref: '../../common/responses/errors.yaml#/InternalError'
-    delete:
-      summary: ユーザーの削除
-      operationId: deleteUser
-      tags:
-        - users
-      responses:
-        '204':
-          description: 削除成功
-        '404':
-          $ref: '../../common/responses/errors.yaml#/NotFound'
-        '500':
-          $ref: '../../common/responses/errors.yaml#/InternalError'
+    $ref: './paths/api_users_id.yaml'
+
+components:
+  schemas:
+    User:
+      $ref: './schemas/user.yaml'
+    CreateUserRequest:
+      $ref: './request/create_user.yaml'
+    UpdateUserRequest:
+      $ref: './request/update_user.yaml'
+    ListUsersResponse:
+      $ref: './response/list_users.yaml'

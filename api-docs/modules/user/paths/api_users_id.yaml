@@ -1,0 +1,87 @@
+parameters:
+  - name: id
+    in: path
+    required: true
+    schema:
+      type: integer
+    description: ユーザーID
+get:
+  summary: 指定IDのユーザー情報取得
+  operationId: getUserById
+  tags:
+    - users
+  responses:
+    '200':
+      description: 成功
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/User'
+    '404':
+      description: 存在しない
+      content:
+        application/json:
+          schema:
+            $ref: '../../../common/openapi.yaml#/components/schemas/APIError'
+    '500':
+      description: 内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '../../../common/openapi.yaml#/components/schemas/APIError'
+put:
+  summary: ユーザー情報の更新
+  operationId: updateUser
+  tags:
+    - users
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../openapi.yaml#/components/schemas/UpdateUserRequest'
+  responses:
+    '200':
+      description: 更新成功
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/User'
+    '400':
+      description: 不正なエラー
+      content:
+        application/json:
+          schema:
+            $ref: '../../../common/openapi.yaml#/components/schemas/APIError'
+    '404':
+      description: 存在しない
+      content:
+        application/json:
+          schema:
+            $ref: '../../../common/openapi.yaml#/components/schemas/APIError'
+    '500':
+      description: 内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '../../../common/openapi.yaml#/components/schemas/APIError'
+delete:
+  summary: ユーザーの削除
+  operationId: deleteUser
+  tags:
+    - users
+  responses:
+    '204':
+      description: 削除成功
+    '404':
+      description: 存在しない
+      content:
+        application/json:
+          schema:
+            $ref: '../../../common/openapi.yaml#/components/schemas/APIError'
+    '500':
+      description: 内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '../../../common/openapi.yaml#/components/schemas/APIError'

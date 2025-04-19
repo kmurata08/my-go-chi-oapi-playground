@@ -1,13 +1,8 @@
 type: object
 required:
-  - id
   - name
   - email
 properties:
-  id:
-    type: integer
-    format: int64
-    description: ユーザーの一意識別子
   name:
     type: string
     description: ユーザー名

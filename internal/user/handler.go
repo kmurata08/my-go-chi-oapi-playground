@@ -2,32 +2,25 @@ package user
 
 import (
 	"encoding/json"
-	"github.com/go-chi/chi/v5"
 	"github.com/kmurata08/my-go-chi-oapi-playground/internal/common/errors"
 	"github.com/kmurata08/my-go-chi-oapi-playground/internal/common/server"
+	user2 "github.com/kmurata08/my-go-chi-oapi-playground/internal/gen/user"
 	"net/http"
-	"strconv"
 )
 
 type Handler struct {
 	service *Service
 }
 
-// NewHandler は新しいユーザーハンドラーを生成します。
 func NewHandler(service *Service) *Handler {
 	return &Handler{
 		service: service,
 	}
 }
 
-func (h *Handler) Register(r chi.Router) {
-	r.Route("/api/users", func(r chi.Router) {
-		r.Get("/", server.WithErrorHandler(h.ListUsers))
-		r.Post("/", server.WithErrorHandler(h.CreateUser))
-		r.Get("/{id}", server.WithErrorHandler(h.GetUser))
-		r.Put("/{id}", server.WithErrorHandler(h.UpdateUser))
-		r.Delete("/{id}", server.WithErrorHandler(h.DeleteUser))
-	})
+// ErrorAdapter ServerInterfaceに適合するアダプター
+type ErrorAdapter struct {
+	*Handler
 }
 
 func (h *Handler) ListUsers(w http.ResponseWriter, r *http.Request) error {
@@ -36,17 +29,15 @@ func (h *Handler) ListUsers(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	return json.NewEncoder(w).Encode(users)
-}
-
-func (h *Handler) GetUser(w http.ResponseWriter, r *http.Request) error {
-	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		return errors.NewBadRequestError("invalid_id", "Invalid user ID format")
+	response := map[string]interface{}{
+		"users": users,
 	}
 
+	w.Header().Set("Content-Type", "application/json")
+	return json.NewEncoder(w).Encode(response)
+}
+
+func (h *Handler) GetUserById(w http.ResponseWriter, r *http.Request, id int) error {
 	user, err := h.service.GetUser(r.Context(), id)
 	if err != nil {
 		return err
@@ -61,7 +52,7 @@ func (h *Handler) GetUser(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) error {
-	var input CreateUserRequest
+	var input user2.CreateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		return errors.NewBadRequestError("invalid_input", "Could not parse request body")
 	}
@@ -80,14 +71,8 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) error {
 	return json.NewEncoder(w).Encode(user)
 }
 
-func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) error {
-	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		return errors.NewBadRequestError("invalid_id", "Invalid user ID format")
-	}
-
-	var input UpdateUserRequest
+func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request, id int) error {
+	var input user2.UpdateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		return errors.NewBadRequestError("invalid_input", "Could not parse request body")
 	}
@@ -105,14 +90,8 @@ func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) error {
 	return json.NewEncoder(w).Encode(user)
 }
 
-func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) error {
-	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		return errors.NewBadRequestError("invalid_id", "Invalid user ID format")
-	}
-
-	err = h.service.DeleteUser(r.Context(), id)
+func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request, id int) error {
+	err := h.service.DeleteUser(r.Context(), id)
 	if err != nil {
 		return err
 	}
@@ -121,18 +100,32 @@ func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-type User struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
+func (a *ErrorAdapter) ListUsers(w http.ResponseWriter, r *http.Request) {
+	server.WithErrorHandler(func(w http.ResponseWriter, r *http.Request) error {
+		return a.Handler.ListUsers(w, r)
+	})(w, r)
 }
 
-type CreateUserRequest struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
+func (a *ErrorAdapter) GetUserById(w http.ResponseWriter, r *http.Request, id int) {
+	server.WithErrorHandler(func(w http.ResponseWriter, r *http.Request) error {
+		return a.Handler.GetUserById(w, r, id)
+	})(w, r)
 }
 
-type UpdateUserRequest struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
+func (a *ErrorAdapter) CreateUser(w http.ResponseWriter, r *http.Request) {
+	server.WithErrorHandler(func(w http.ResponseWriter, r *http.Request) error {
+		return a.Handler.CreateUser(w, r)
+	})(w, r)
+}
+
+func (a *ErrorAdapter) UpdateUser(w http.ResponseWriter, r *http.Request, id int) {
+	server.WithErrorHandler(func(w http.ResponseWriter, r *http.Request) error {
+		return a.Handler.UpdateUser(w, r, id)
+	})(w, r)
+}
+
+func (a *ErrorAdapter) DeleteUser(w http.ResponseWriter, r *http.Request, id int) {
+	server.WithErrorHandler(func(w http.ResponseWriter, r *http.Request) error {
+		return a.Handler.DeleteUser(w, r, id)
+	})(w, r)
 }

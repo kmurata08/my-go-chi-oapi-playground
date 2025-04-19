@@ -9,16 +9,52 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/oapi-codegen/runtime"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
+
+// CreateUserRequest defines model for CreateUserRequest.
+type CreateUserRequest struct {
+	// Email メールアドレス
+	Email openapi_types.Email `json:"email"`
+
+	// Name ユーザー名
+	Name string `json:"name"`
+}
+
+// ListUsersResponse defines model for ListUsersResponse.
+type ListUsersResponse struct {
+	Users []User `json:"users"`
+}
+
+// UpdateUserRequest defines model for UpdateUserRequest.
+type UpdateUserRequest struct {
+	// Email メールアドレス
+	Email *openapi_types.Email `json:"email,omitempty"`
+
+	// Name ユーザー名
+	Name *string `json:"name,omitempty"`
+}
+
+// User defines model for User.
+type User struct {
+	// Email メールアドレス
+	Email openapi_types.Email `json:"email"`
+
+	// Id ユーザーの一意識別子
+	Id int64 `json:"id"`
+
+	// Name ユーザー名
+	Name string `json:"name"`
+}
+
+// UpdateUserJSONRequestBody defines body for UpdateUser for application/json ContentType.
+type UpdateUserJSONRequestBody = UpdateUserRequest
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// ユーザー一覧の取得
 	// (GET /api/users)
 	ListUsers(w http.ResponseWriter, r *http.Request)
-	// 新規ユーザーの作成
-	// (POST /api/users)
-	CreateUser(w http.ResponseWriter, r *http.Request)
 	// ユーザーの削除
 	// (DELETE /api/users/{id})
 	DeleteUser(w http.ResponseWriter, r *http.Request, id int)
@@ -37,12 +73,6 @@ type Unimplemented struct{}
 // ユーザー一覧の取得
 // (GET /api/users)
 func (_ Unimplemented) ListUsers(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// 新規ユーザーの作成
-// (POST /api/users)
-func (_ Unimplemented) CreateUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -78,20 +108,6 @@ func (siw *ServerInterfaceWrapper) ListUsers(w http.ResponseWriter, r *http.Requ
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ListUsers(w, r)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r)
-}
-
-// CreateUser operation middleware
-func (siw *ServerInterfaceWrapper) CreateUser(w http.ResponseWriter, r *http.Request) {
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.CreateUser(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -291,9 +307,6 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/users", wrapper.ListUsers)
-	})
-	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/api/users", wrapper.CreateUser)
 	})
 	r.Group(func(r chi.Router) {
 		r.Delete(options.BaseURL+"/api/users/{id}", wrapper.DeleteUser)

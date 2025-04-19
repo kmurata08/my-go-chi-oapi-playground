@@ -1,0 +1,48 @@
+get:
+  summary: ユーザー一覧の取得
+  operationId: listUsers
+  tags:
+    - users
+  responses:
+    '200':
+      description: 成功
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/ListUsersResponse'
+    '400':
+      description: 不正なエラー
+      content:
+        application/json:
+          schema:
+            $ref: '../../../common/openapi.yaml#/components/schemas/APIError'
+    post:
+      summary: 新規ユーザーの作成
+      operationId: createUser
+      tags:
+        - users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: ユーザーが作成されました
+          content:
+            application/json:
+              schema:
+                $ref: '../openapi.yaml#/components/schemas/User'
+        '400':
+          description: 不正なエラー
+          content:
+            application/json:
+              schema:
+                $ref: '../../../common/openapi.yaml#/components/schemas/APIError'
+        '500':
+          description: 内部エラー
+          content:
+            application/json:
+              schema:
+                $ref: '../../../common/openapi.yaml#/components/schemas/APIError'

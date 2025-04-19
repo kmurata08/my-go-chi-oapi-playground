@@ -1,0 +1,7 @@
+output: internal/gen/common/api.gen.go
+package: common
+output-options:
+  # to make sure that all types are generated
+  skip-prune: true
+generate:
+  models: true

@@ -1,0 +1,10 @@
+output: internal/gen/user/api.gen.go
+package: user
+generate:
+  chi-server: true
+  models: true
+output-options:
+  skip-prune: true
+import-mapping:
+  ../../../common/openapi.yaml: github.com/kmurata08/my-go-chi-oapi-playground/internal/gen/common
+  ../openapi.yaml: "-"

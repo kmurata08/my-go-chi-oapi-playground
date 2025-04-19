@@ -1,0 +1,9 @@
+type: object
+required:
+  - users
+  - pagination
+properties:
+  users:
+    type: array
+    items:
+      $ref: '../openapi.yaml#/components/schemas/User'
